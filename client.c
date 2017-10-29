@@ -26,10 +26,7 @@ main(int argc, char **argv)
     serv_addr.sin_addr.s_addr = inet_addr(SERV_HOST_ADDR);
     serv_addr.sin_port        = htons(SERV_TCP_PORT);
 
-    /* Display the menu, read user's response, and send it to the server. */
-    while( get_response(&s)) {
-
-        /* Create a socket (an endpoint for communication). */
+    /* Create a socket (an endpoint for communication). */
         if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
             perror("client: can't open stream socket");
             return(1);
@@ -42,10 +39,78 @@ main(int argc, char **argv)
             return(1);
         }
 
-        printf("%s", s);       
+
+
+    char   username[10];
+    printf("===========================================\n");
+    printf("                   Enter Username: \n");
+    printf("-------------------------------------------\n");
+    fgets(username, 100, stdin);
+    printf("===========================================\n");
+
+    printf("%s", username);
+    char sendUsername[11];
+    char character = ' ';
+    int i; 
+    int usernameIndex = -1; 
+
+
+
+    sendUsername[0] = character; 
+    for(i = 0; i < 10; i++)
+    {
+	    sendUsername[i+1] = username[i];
+    }
+
+    char coolResponse[100];
+    printf("client username:%s", sendUsername);
+
+    write (sockfd, sendUsername, 10);
+
+	/* Read the server's reply. */
+	nread = readn (sockfd, coolResponse, MAX);
+	if (nread > 0) {
+		printf("   %s\n", coolResponse);
+	} else {
+		printf("Nothing read. \n");
+	}
+
+
+	nread = 0; 
+
+    
+    close(sockfd); 
+	
+    /* Display the menu, read user's response, and send it to the server. */
+    while( get_response(&s)) {
+
+        /* Create a socket (an endpoint for communication). */
+        if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            perror("client: can't open stream socket");
+            return(1);
+        }
+
+	printf("i am in here now");
+	fflush(stdout);
+        /* Connect to the server. */
+        if (connect(sockfd, (struct sockaddr *) &serv_addr,
+          sizeof(serv_addr)) < 0) {
+            perror("client: can't connect to server");
+            return(1);
+        }
+
+	printf("it worked in here");
+	fflush(stdout);
+
+        //printf("%s", s);       
+	
+
+
          
         /* Send the user's request to the server. */
         write (sockfd, s, 100);
+	printf("you did it");
+	fflush(stdout);
         
         /* Read the server's reply. */
         nread = readn (sockfd, s, MAX);
@@ -55,6 +120,8 @@ main(int argc, char **argv)
 		printf("Nothing read. \n");
 	}
         close(sockfd);
+	nread = 0;
+	strcpy(s, "");
     }
     return(0);  /* Exit if response is 4  */
 }

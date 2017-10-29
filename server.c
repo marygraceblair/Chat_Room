@@ -111,7 +111,7 @@ void *do_something(void	*arg)
                 printf("Thread %u read request %s \n", tid, request);
 #endif
 		/* Generate an appropriate reply. */
-                while (nread > 0)
+                if (nread > 0)
                 {
 			clock =	time(0);
 			timeptr	= localtime(&clock);
@@ -131,8 +131,25 @@ void *do_something(void	*arg)
 						  break;
 			} */
 
+			if (request[0] == ' ')
+			{
+				char c = request[0];
+				printf("this is the char:%c", c);
+				fflush(stdout);
+				printf("char was printed");
+				fflush(stdout);
+
+				strcpy(s, "username added");
+
+			}
+			else
+			{
+				strcpy(s, request);
+
+			}
+
+
 			/* Send	the reply to the client. */
-			strcpy(s, request);
 			write(newsockfd, s, MAX);
 		        nread = read(newsockfd,	&request, MAX);
 		}
