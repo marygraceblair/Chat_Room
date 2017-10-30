@@ -11,5 +11,5 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define	SERV_TCP_PORT	9179
+#define	SERV_TCP_PORT	917009
 #define	SERV_HOST_ADDR	"129.130.10.39"  /* Change this to be your host addr */

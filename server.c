@@ -16,7 +16,9 @@ void *do_something(void	*); /* new thread's code */
 int sockfd;
 pthread_t *threads;
 unsigned int *threads_ids;
-
+pthread_mutex_t mutex;
+char usernames[10][10];
+int indexUsernames = -1; 
 
 main(int argc, char **argv)
 {
@@ -26,6 +28,7 @@ main(int argc, char **argv)
         int       ret_val;
         pthread_attr_t attr;
 
+	pthread_mutex_init(&mutex, NULL);
 	/* Create communication	endpoint */
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0))	< 0) {
 		perror("server:	can't open stream socket");
@@ -77,6 +80,7 @@ main(int argc, char **argv)
 #if DEBUG
         printf("\nParent is exiting, sorry clients...\n");
 #endif
+	pthread_mutex_destroy(&mutex);
         exit(0);
 }
 
@@ -140,6 +144,39 @@ void *do_something(void	*arg)
 				fflush(stdout);
 
 				strcpy(s, "username added");
+				char username[10];
+				strcpy(username, &(request[1]));
+
+				int i;
+				int lock_ret = 1;
+				
+				do {
+					lock_ret = pthread_mutex_trylock(&mutex);
+					
+					if(lock_ret){
+					printf("lock failed attempt again after 2secs..\n");
+					fflush(stdout);
+					sleep(2);
+					}
+					else{
+					printf("lock success");	
+					fflush(stdout);
+					
+					break;
+					}
+
+				} while(lock_ret);
+
+					indexUsernames++;
+					strcpy(usernames[indexUsernames], username);
+					
+					int x; 
+					for (x = 0; x <= indexUsernames; x++)
+					{
+						printf("\n%s\n", usernames[x]);
+						fflush(stdout);
+					}
+					lock_ret = pthread_mutex_unlock(&mutex);
 
 			}
 			else
