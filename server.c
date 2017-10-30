@@ -115,24 +115,13 @@ void *do_something(void	*arg)
 
 	tid = pthread_self();		/* who am i */
 
-	for (i=1;i<=2;i++)  // each thread only processes two requests...
+	for (; ; )  // each thread only processes two requests...
 	{
-		/* Accept a new	connection request. */
-		/*
-		clilen = sizeof(cli_addr);
-		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-		if (newsockfd <	0) {
-			perror("server:	accept error");
-			exit(1);
-		}
-		*/
 
-		printf("hello");
-		fflush(stdout);
 		/* Read	the request from the client. */
 		nread = read(newsockfd,	&request, MAX);
 #if DEBUG
-                printf("Thread %u read request %s \n", tid, request);
+                //printf("Thread %u read request %s \n", tid, request);
 #endif
 		/* Generate an appropriate reply. */
                 if (nread > 0)
