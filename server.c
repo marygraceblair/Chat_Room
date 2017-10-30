@@ -19,12 +19,13 @@ unsigned int *threads_ids;
 pthread_mutex_t mutex;
 char usernames[10][10];
 int indexUsernames = -1; 
-
+int newsockfd, clilen;
+struct	    sockaddr_in  cli_addr;
 main(int argc, char **argv)
 {
 	struct sockaddr_in serv_addr;
 	int	  num_threads = 5;
-	int	  i;
+	int	  i = -1;;
         int       ret_val;
         pthread_attr_t attr;
 
@@ -57,13 +58,28 @@ main(int argc, char **argv)
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
         threads[0] = pthread_self(); // parent thread
 
-        for (i = 1; i <= num_threads; i++) {
-            ret_val = pthread_create(&threads[i], &attr, do_something, NULL);
-            if (ret_val < 0) {
-                printf("ERROR; return code from pthread_create() is %d\n", ret_val);
-                exit(-1);
-            }
-        }
+	while(1)
+	{
+
+		printf("ok inside loop");
+		fflush(stdout);
+		/* Accept a new	connection request. */
+		clilen = sizeof(cli_addr);
+		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+		if (newsockfd <	0) {
+			perror("server:	accept error");
+			exit(1);
+		}
+		printf("accepted");
+		fflush(stdout);
+
+		
+		i++;
+	        ret_val = pthread_create(&threads[i], &attr, do_something, NULL);
+		printf("worked once");
+		fflush(stdout);
+	}
+	
 
         /* Free attribute and wait for the worker threads to exit */
         pthread_attr_destroy(&attr);
@@ -86,8 +102,8 @@ main(int argc, char **argv)
 
 void *do_something(void	*arg)
 {
-	int	    newsockfd, clilen, childpid;
-	struct	    sockaddr_in  cli_addr, serv_addr;
+	int	     childpid;
+	struct	    sockaddr_in   serv_addr;
 	struct tm   *timeptr;  /* pointer to time structure*/
 	time_t	    clock;	 /* clock value	(in secs)	*/
 	char	    s[MAX];
@@ -102,13 +118,17 @@ void *do_something(void	*arg)
 	for (i=1;i<=2;i++)  // each thread only processes two requests...
 	{
 		/* Accept a new	connection request. */
+		/*
 		clilen = sizeof(cli_addr);
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		if (newsockfd <	0) {
 			perror("server:	accept error");
 			exit(1);
 		}
+		*/
 
+		printf("hello");
+		fflush(stdout);
 		/* Read	the request from the client. */
 		nread = read(newsockfd,	&request, MAX);
 #if DEBUG
@@ -117,24 +137,8 @@ void *do_something(void	*arg)
 		/* Generate an appropriate reply. */
                 if (nread > 0)
                 {
-			clock =	time(0);
-			timeptr	= localtime(&clock);
-/*
-			switch(request)	{
-
-			 case '1': strftime(s,MAX,"%A, %B %d, %Y",timeptr);
-						   break;
-
-			 case '2': strftime(s,MAX,"%T",timeptr);
-					   break;
-
-			 case '3': strftime(s,MAX,"%A, %B %d, %Y - %T",timeptr);
-						   break;
-
-			 default: strcpy(s,"Invalid request\n");
-						  break;
-			} */
-
+			printf("inside nread");
+			fflush(stdout);
 			if (request[0] == ' ')
 			{
 				char c = request[0];
@@ -181,6 +185,8 @@ void *do_something(void	*arg)
 			}
 			else
 			{
+				printf("insdie else");
+				fflush(stdout);
 				strcpy(s, request);
 
 			}
@@ -188,9 +194,9 @@ void *do_something(void	*arg)
 
 			/* Send	the reply to the client. */
 			write(newsockfd, s, MAX);
-		        nread = read(newsockfd,	&request, MAX);
+		        //nread = read(newsockfd,	&request, MAX);
 		}
-                close(newsockfd);
+                //close(newsockfd);
 	}
 	pthread_exit(0);
 	return 1;

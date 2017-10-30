@@ -79,25 +79,31 @@ main(int argc, char **argv)
 	nread = 0; 
 
     
-    close(sockfd); 
+    //close(sockfd); 
 	
     /* Display the menu, read user's response, and send it to the server. */
     while( get_response(&s)) {
 
         /* Create a socket (an endpoint for communication). */
+	    /*
         if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
             perror("client: can't open stream socket");
             return(1);
         }
+	/*
 
 	printf("i am in here now");
 	fflush(stdout);
+	
         /* Connect to the server. */
+	    /*
         if (connect(sockfd, (struct sockaddr *) &serv_addr,
           sizeof(serv_addr)) < 0) {
             perror("client: can't connect to server");
             return(1);
         }
+	*/
+	
 
 	printf("it worked in here");
 	fflush(stdout);
